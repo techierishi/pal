@@ -1,0 +1,139 @@
+env:
+- CGO_ENABLED=1
+release:
+  github:
+    owner: techierishi
+    name: pal
+  name_template: '{{.Tag}}'
+brews:
+  -
+    tap:
+      owner: techierishi
+      name: pal
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@carlosbecker.com
+    description: "Simple command-line snippet manager"
+    homepage: "https://github.com/techierishi/pal"
+    install: |
+      bin.install Dir['pal']
+      zsh_completion.install "misc/completions/zsh/_pal"
+    test: |
+      system "#{bin}/pal"
+builds:
+  - id: pal-darwin-amd64
+    binary: pal
+    main: ./cmd/pal
+    goarch:
+      - amd64
+    goos:
+      - darwin
+    env:
+      - CC=o64-clang
+      - CXX=o64-clang++
+    flags:
+      - -trimpath
+
+  - id: pal-darwin-arm64
+    binary: pal
+    main: ./cmd/pal
+    goarch:
+      - arm64
+    goos:
+      - darwin
+    env:
+      - CC=oa64-clang
+      - CXX=oa64-clang++
+    flags:
+      - -trimpath
+  - id: pal-linux-amd64
+    binary: pal
+    main: ./cmd/pal
+    env:
+      - CC=x86_64-linux-gnu-gcc
+      - CXX=x86_64-linux-gnu-g++
+    goarch:
+      - amd64
+    goos:
+      - linux
+    flags:
+      - -trimpath
+    ldflags:
+      - -extldflags "-lc -lrt -lpthread --static"
+  - id: pal-linux-arm64
+    binary: pal
+    main: ./cmd/pal
+    goarch:
+      - arm64
+    goos:
+      - linux
+    env:
+      - CC=aarch64-linux-gnu-gcc
+      - CXX=aarch64-linux-gnu-g++
+    flags:
+      - -trimpath
+    ldflags:
+      - -extldflags "-lc -lrt -lpthread --static"
+  - id: pal-windows-amd64
+    binary: pal
+    main: ./cmd/pal
+    goarch:
+      - amd64
+    goos:
+      - windows
+    env:
+      - CC=x86_64-w64-mingw32-gcc
+      - CXX=x86_64-w64-mingw32-g++
+    flags:
+      - -trimpath
+      - -buildmode=exe
+universal_binaries:
+  - id: pal-darwin-universal
+    ids:
+      - pal-darwin-amd64
+      - pal-darwin-arm64
+    replace: true
+    name_template: "pal"
+archives:
+  - id: w/version
+    builds:
+      - pal-darwin-universal
+      - pal-linux-amd64
+      - pal-linux-arm64
+      - pal-windows-amd64
+    name_template: "pal_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    wrap_in_directory: false
+    format: zip
+    files:
+      - none*
+  - id: wo/version
+    builds:
+      - pal-darwin-universal
+      - pal-linux-amd64
+      - pal-linux-arm64
+      - pal-windows-amd64
+    name_template: "pal_{{ .Os }}_{{ .Arch }}"
+    wrap_in_directory: false
+    format: zip
+    files:
+      - none*
+
+checksum:
+  name_template: '{{ .ProjectName }}_{{ .Version }}_checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+gitlab_urls:
+  use_package_registry: true
+nfpms:
+  -
+    homepage: https://github.com/techierishi/pal
+    maintainer: Rishi <techierishi@gmail.com>
+    description: "Simple command-line snippet manager"
+    bindir: /usr/local/bin
+    license: MIT
+    formats:
+    - deb
+    - rpm
+

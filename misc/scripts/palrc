@@ -1,0 +1,14 @@
+####### DYNAMICALLY GENERATED FILE - DO NOT EDIT #######
+
+####### <Alias> #######
+{{{aliases}}}
+alias "ph=pal hist list"
+alias "pc=pal clip list"
+alias "pe=pal snip exec --command"
+alias "pc=pal cred list"
+####### <Alias/> #######
+
+
+####### <Bind> #######
+{{{binds}}}
+####### <Bind/> #######
