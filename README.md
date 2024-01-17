@@ -1,5 +1,7 @@
 # pal : Simple cli app which makes your cli interaction easier.
 
+<img src="doc/logo.png" width="150">
+
 # Usage
 
 Run `pal init` right after installation. This step ensures `ctr+r` will open interactive shell history search. It also add some alias shortcuts for commond pal commands
