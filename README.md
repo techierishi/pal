@@ -1,5 +1,5 @@
 # pal : Simple cli app which makes your cli interaction easier.
-
+### A CLI app with features like snippet manager, shell history manager, clipboard manager, alias manager, config sync etc.
 <p align="center">
 <img src="doc/logo.png" width="200">
 </p>
