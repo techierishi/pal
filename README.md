@@ -1,6 +1,8 @@
 # pal : Simple cli app which makes your cli interaction easier.
 
-<img src="doc/logo.png" width="150">
+<p align="center">
+<img src="doc/logo.png" width="200">
+</p>
 
 # Usage
 
