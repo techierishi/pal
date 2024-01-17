@@ -4,6 +4,12 @@
 <img src="doc/logo.png" width="200">
 </p>
 
+---
+
+<p align="center">
+<img src="doc/pal.gif" >
+</p>
+
 # Usage
 
 Run `pal init` right after installation. This step ensures `ctr+r` will open interactive shell history search. It also add some alias shortcuts for commond pal commands
