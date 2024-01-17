@@ -63,7 +63,8 @@ Global Flags:
 Use "pal snip [command] --help" for more information about a command.
 
 ```
-
+## Snippet demo
+[![Snippet Demo](https://img.youtube.com/vi/_1TxNmnTArY/maxresdefault.jpg)](https://youtu.be/_1TxNmnTArY)
 
 ## Shell history usage
 
@@ -82,6 +83,9 @@ Global Flags:
       --config string   config file (default is C:\Users\techi\AppData\Roaming\pal )
       --debug           debug mode
 ```
+
+## Shell history demo
+[![Shell history demo](https://img.youtube.com/vi/wlgeyqcLLdc/maxresdefault.jpg)](https://youtu.be/wlgeyqcLLdc)
 
 ## Clipboard usage
 
@@ -104,6 +108,8 @@ Global Flags:
 Use "pal clip [command] --help" for more information about a command.
 ```
 
+## Clipboard demo
+[![Clipboard demo](https://img.youtube.com/vi/oLKWGm4od7c/maxresdefault.jpg)](https://youtu.be/oLKWGm4od7c)
 
 ## Credential usage
 
@@ -130,7 +136,8 @@ Global Flags:
 
 Use "pal cred [command] --help" for more information about a command.
 ```
-## Demo
+## Credential manager demo
+[![Credential manager demo](https://img.youtube.com/vi/Aq59JX6Er1E/maxresdefault.jpg)](https://youtu.be/Aq59JX6Er1E)
 
 ## Installation
 
