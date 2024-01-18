@@ -65,7 +65,7 @@ func PassSearch() error {
 	selectedCred.Timestamp = util.UnixMilli()
 	credDb.Upsert(fmt.Sprintf("%s.%s", CRED_TBL, selectedItem.Index()), selectedCred)
 
-	fmt.Printf("%s\n", color.GreenString("Copied credential clipboard!"))
+	fmt.Printf("%s\n", color.GreenString("Copied credential to clipboard!"))
 
 	return nil
 }

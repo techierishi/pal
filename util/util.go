@@ -152,7 +152,7 @@ func initCheckFromCache(stateFile *db.Storage) bool {
 		return false
 	}
 
-	initCheckBool, err := stateFile.GetPath("app.status")
+	initCheckBool, err := stateFile.GetPath("init.status")
 	if err != nil {
 		return false
 	}
