@@ -21,102 +21,71 @@ brews:
     test: |
       system "#{bin}/pal"
 builds:
-  - id: pal-darwin-amd64
-    binary: pal
+  - id: darwin-amd64
     main: ./cmd/pal
-    goarch:
-      - amd64
+    binary: pal
     goos:
       - darwin
+    goarch:
+      - amd64
     env:
       - CC=o64-clang
       - CXX=o64-clang++
-    flags:
-      - -trimpath
+    ldflags:
+      -s -w -X 'github.com/techierishi/pal/versioning.Version=v{{ .Version }}'
 
-  - id: pal-darwin-arm64
-    binary: pal
+  - id: darwin-arm64
     main: ./cmd/pal
-    goarch:
-      - arm64
+    binary: pal
     goos:
       - darwin
+    goarch:
+      - arm64
     env:
       - CC=oa64-clang
       - CXX=oa64-clang++
-    flags:
-      - -trimpath
-  - id: pal-linux-amd64
-    binary: pal
+    ldflags:
+      -s -w -X 'github.com/techierishi/pal/versioning.Version=v{{ .Version }}'
+
+  - id: linux-amd64
     main: ./cmd/pal
-    env:
-      - CC=x86_64-linux-gnu-gcc
-      - CXX=x86_64-linux-gnu-g++
+    binary: pal
+    goos:
+      - linux
     goarch:
       - amd64
+    env:
+      - CC=gcc
+      - CXX=g++
+    ldflags:
+      # We need to build a static binary because we are building in a glibc based system and running in a musl container
+      -s -w -linkmode external -extldflags "-static" -X 'github.com/techierishi/pal/versioning.Version=v{{ .Version }}'
+    tags:
+      - netgo
+      - osusergo
+
+  - id: linux-arm64
+    main: ./cmd/pal
+    binary: pal
     goos:
       - linux
-    flags:
-      - -trimpath
-    ldflags:
-      - -extldflags "-lc -lrt -lpthread --static"
-  - id: pal-linux-arm64
-    binary: pal
-    main: ./cmd/pal
     goarch:
       - arm64
-    goos:
-      - linux
     env:
       - CC=aarch64-linux-gnu-gcc
       - CXX=aarch64-linux-gnu-g++
-    flags:
-      - -trimpath
     ldflags:
-      - -extldflags "-lc -lrt -lpthread --static"
-  - id: pal-windows-amd64
-    binary: pal
-    main: ./cmd/pal
-    goarch:
-      - amd64
-    goos:
-      - windows
-    env:
-      - CC=x86_64-w64-mingw32-gcc
-      - CXX=x86_64-w64-mingw32-g++
-    flags:
-      - -trimpath
-      - -buildmode=exe
-universal_binaries:
-  - id: pal-darwin-universal
-    ids:
-      - pal-darwin-amd64
-      - pal-darwin-arm64
-    replace: true
-    name_template: "pal"
+      # We need to build a static binary because we are building in a glibc based system and running in a musl container
+      -s -w -linkmode external -extldflags "-static" -X 'github.com/techierishi/pal/versioning.Version=v{{ .Version }}'
+    tags:
+      - netgo
+      - osusergo
+
 archives:
-  - id: w/version
-    builds:
-      - pal-darwin-universal
-      - pal-linux-amd64
-      - pal-linux-arm64
-      - pal-windows-amd64
-    name_template: "pal_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    wrap_in_directory: false
-    format: zip
+  -
     files:
-      - none*
-  - id: wo/version
-    builds:
-      - pal-darwin-universal
-      - pal-linux-amd64
-      - pal-linux-arm64
-      - pal-windows-amd64
-    name_template: "pal_{{ .Os }}_{{ .Arch }}"
-    wrap_in_directory: false
-    format: zip
-    files:
-      - none*
+      - LICENSE
+      - README.md
 
 checksum:
   name_template: '{{ .ProjectName }}_{{ .Version }}_checksums.txt'
@@ -124,16 +93,15 @@ snapshot:
   name_template: "{{ incpatch .Version }}-next"
 changelog:
   sort: asc
-gitlab_urls:
-  use_package_registry: true
-nfpms:
-  -
-    homepage: https://github.com/techierishi/pal
-    maintainer: Rishi <techierishi@gmail.com>
-    description: "Simple command-line snippet manager"
-    bindir: /usr/local/bin
-    license: MIT
-    formats:
-    - deb
-    - rpm
+
+# nfpms:
+#   -
+#     homepage: https://github.com/techierishi/pal
+#     maintainer: Rishi <techierishi@gmail.com>
+#     description: "Simple command-line snippet manager"
+#     bindir: /usr/local/bin
+#     license: MIT
+#     formats:
+#     - deb
+#     - rpm
 
