@@ -22,7 +22,7 @@ brews:
       system "#{bin}/pal"
 builds:
   - id: darwin-amd64
-    main: ./cmd/pal
+    main: main.go
     binary: pal
     goos:
       - darwin
@@ -35,7 +35,7 @@ builds:
       -s -w -X 'github.com/techierishi/pal/versioning.Version=v{{ .Version }}'
 
   - id: darwin-arm64
-    main: ./cmd/pal
+    main: main.go
     binary: pal
     goos:
       - darwin
@@ -48,7 +48,7 @@ builds:
       -s -w -X 'github.com/techierishi/pal/versioning.Version=v{{ .Version }}'
 
   - id: linux-amd64
-    main: ./cmd/pal
+    main: main.go
     binary: pal
     goos:
       - linux
@@ -65,7 +65,7 @@ builds:
       - osusergo
 
   - id: linux-arm64
-    main: ./cmd/pal
+    main: main.go
     binary: pal
     goos:
       - linux
