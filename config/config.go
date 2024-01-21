@@ -69,16 +69,17 @@ var Flag FlagConfig
 
 // FlagConfig is a struct of flag
 type FlagConfig struct {
-	Debug     bool
-	Query     string
-	FilterTag string
-	Command   bool
-	Copy      bool
-	Delimiter string
-	OneLine   bool
-	Color     bool
-	Tag       bool
-	Detach    bool
+	Debug        bool
+	Query        string
+	FilterTag    string
+	Command      bool
+	Copy         bool
+	Delimiter    string
+	OneLine      bool
+	Color        bool
+	Tag          bool
+	Detach       bool
+	HasClipboard bool
 }
 
 // Load loads a config yaml

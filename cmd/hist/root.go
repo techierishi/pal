@@ -46,8 +46,10 @@ func execFunc(cmd *cobra.Command, args []string) (err error) {
 		fmt.Printf("%s: %s\n", color.YellowString("Command"), command)
 	}
 	if config.Flag.Copy {
-		clipboard.Write(0, []byte(command))
-		fmt.Printf("%s\n", color.GreenString("Copied selected command!"))
+		if config.Flag.HasClipboard {
+			clipboard.Write(0, []byte(command))
+			fmt.Printf("%s\n", color.GreenString("Copied selected command!"))
+		}
 		return nil
 	}
 

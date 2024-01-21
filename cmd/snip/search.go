@@ -6,8 +6,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/techierishi/pal/config"
-	"github.com/techierishi/pal/search"
 	"github.com/techierishi/pal/snipm"
+	"github.com/techierishi/pal/tui"
 	"golang.org/x/crypto/ssh/terminal"
 	"gopkg.in/alessio/shellescape.v1"
 )
@@ -38,7 +38,7 @@ func searchFunc(cmd *cobra.Command, args []string) (err error) {
 		options = append(options, fmt.Sprintf("--query %s", shellescape.Quote(flag.Query)))
 	}
 
-	customLabel := search.CustomLabel{
+	customLabel := tui.CustomLabel{
 		SearchTitle:   "Snippets",
 		EnterHelpText: "print to terminal",
 	}

@@ -10,7 +10,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/techierishi/pal/config"
 	"github.com/techierishi/pal/logr"
-	"github.com/techierishi/pal/search"
+	"github.com/techierishi/pal/tui"
 	"github.com/techierishi/pal/util"
 )
 
@@ -36,7 +36,7 @@ func histList() ([]list.Item, Histlist) {
 	searchRowItems := make([]list.Item, 0)
 
 	for idx, val := range histStrList.List {
-		searchRowItems = append(searchRowItems, search.NewSearchRowItem(val, strconv.Itoa(idx)))
+		searchRowItems = append(searchRowItems, tui.NewSearchRowItem(val, strconv.Itoa(idx)))
 	}
 
 	return searchRowItems, histStrList
@@ -50,11 +50,11 @@ func HistList() (string, error) {
 		enterHelpText = "copy to clipboard"
 
 	}
-	customLabel := search.CustomLabel{
+	customLabel := tui.CustomLabel{
 		SearchTitle:   "Shell history",
 		EnterHelpText: enterHelpText,
 	}
-	selectedItem, err := search.SearchUI(customLabel, searchRowItems)
+	selectedItem, err := tui.SearchUI(customLabel, searchRowItems)
 	if err != nil {
 		return "", err
 	}

@@ -8,8 +8,8 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/techierishi/pal/config"
-	"github.com/techierishi/pal/search"
 	"github.com/techierishi/pal/snipm"
+	"github.com/techierishi/pal/tui"
 	"github.com/techierishi/pal/util"
 	"gopkg.in/alessio/shellescape.v1"
 )
@@ -37,7 +37,7 @@ func execFunc(cmd *cobra.Command, args []string) (err error) {
 	if flag.Query != "" {
 		options = append(options, fmt.Sprintf("--query %s", shellescape.Quote(flag.Query)))
 	}
-	customLabel := search.CustomLabel{
+	customLabel := tui.CustomLabel{
 		SearchTitle:   "Snippets",
 		EnterHelpText: "enter to execute",
 	}

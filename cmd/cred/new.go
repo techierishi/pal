@@ -10,7 +10,7 @@ import (
 	"github.com/techierishi/pal/logr"
 	palSync "github.com/techierishi/pal/sync"
 	"github.com/techierishi/pal/util"
-	"github.com/zalando/go-keyring"
+	"github.com/techierishi/pal/wrapper"
 )
 
 var credNewCmd = &cobra.Command{
@@ -47,9 +47,10 @@ func newFunc(cmd *cobra.Command, args []string) (err error) {
 		return fmt.Errorf("Credential for [%s] already exists", newCredential.Application)
 	}
 
-	err = keyring.Set(newCredential.Application, newCredential.Username, newCredential.Password)
-	if err != nil {
-		return err
+	keyRing := wrapper.KeyRing{Logger: logger}
+	ok := keyRing.Set(newCredential.Application, newCredential.Username, newCredential.Password)
+	if !ok {
+		fmt.Printf("%s\n", color.RedString("Keyring not supported on this platform!"))
 	}
 
 	// Password is only saved in os keychain

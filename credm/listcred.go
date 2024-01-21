@@ -6,10 +6,11 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/fatih/color"
 	"github.com/mitchellh/mapstructure"
+	"github.com/techierishi/pal/config"
 	"github.com/techierishi/pal/logr"
-	"github.com/techierishi/pal/search"
+	"github.com/techierishi/pal/tui"
 	"github.com/techierishi/pal/util"
-	"github.com/zalando/go-keyring"
+	"github.com/techierishi/pal/wrapper"
 	"golang.design/x/clipboard"
 )
 
@@ -19,7 +20,7 @@ func passList(credentials Credentials) []list.Item {
 	idx := 0
 	for _, credInfo := range credentials.Credentials {
 		rowStr := fmt.Sprintf("[%s] %s", credInfo.Application, credInfo.Username)
-		passListItems = append(passListItems, search.NewSearchRowItem(rowStr, credInfo.Hash))
+		passListItems = append(passListItems, tui.NewSearchRowItem(rowStr, credInfo.Hash))
 		idx++
 	}
 
@@ -42,30 +43,32 @@ func PassSearch() error {
 		return err
 	}
 	passListItems := passList(credentials)
-	customLabel := search.CustomLabel{
+	customLabel := tui.CustomLabel{
 		SearchTitle:   "Credentials",
 		EnterHelpText: "copy to clipboard",
 	}
-	selectedItem, err := search.SearchUI(customLabel, passListItems)
+	selectedItem, err := tui.SearchUI(customLabel, passListItems)
 	if err != nil {
 		return err
 	}
 
 	selectedCred := CredInfo{}
 	mapstructure.Decode(credMap[selectedItem.Index()], &selectedCred)
-	passwd, err := keyring.Get(selectedCred.Application, selectedCred.Username)
-	if err != nil {
-		logger.Error().AnErr("msg", err)
-		return err
+
+	keyRing := wrapper.KeyRing{Logger: logger}
+	passwd, ok := keyRing.Get(selectedCred.Application, selectedCred.Username)
+	if !ok {
+		fmt.Printf("%s\n", color.RedString("Keyring not supported on this os!"))
 	}
 
-	clipboard.Write(0, []byte(passwd))
+	if config.Flag.HasClipboard {
+		clipboard.Write(0, []byte(passwd))
+		fmt.Printf("%s\n", color.GreenString("Copied credential to clipboard!"))
+	}
 
 	// Update the timestamp to show the mostly used item on top
 	selectedCred.Timestamp = util.UnixMilli()
 	credDb.Upsert(fmt.Sprintf("%s.%s", CRED_TBL, selectedItem.Index()), selectedCred)
-
-	fmt.Printf("%s\n", color.GreenString("Copied credential to clipboard!"))
 
 	return nil
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/techierishi/pal/clipm"
+	"github.com/techierishi/pal/config"
 	clpbaord "golang.design/x/clipboard"
 )
 
@@ -24,8 +25,11 @@ func listFunc(cmd *cobra.Command, args []string) (err error) {
 	if err != nil {
 		return err
 	}
-	clpbaord.Write(0, []byte(selectedClipItem.Content))
-	fmt.Printf("%s\n", color.GreenString("Copied selected item!"))
+
+	if config.Flag.HasClipboard {
+		clpbaord.Write(0, []byte(selectedClipItem.Content))
+		fmt.Printf("%s\n", color.GreenString("Copied selected item!"))
+	}
 
 	return nil
 }

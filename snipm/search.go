@@ -11,11 +11,11 @@ import (
 	"github.com/techierishi/pal/credm"
 	"github.com/techierishi/pal/dialog"
 	"github.com/techierishi/pal/logr"
-	"github.com/techierishi/pal/search"
+	"github.com/techierishi/pal/tui"
 	"github.com/techierishi/pal/util"
 )
 
-func FilterText(customLabel search.CustomLabel, options []string, tag string) (commands []string, err error) {
+func FilterText(customLabel tui.CustomLabel, options []string, tag string) (commands []string, err error) {
 	logger := logr.GetLogInstance()
 
 	snipDb, err := GetSnipDb(logger)
@@ -68,11 +68,11 @@ func FilterText(customLabel search.CustomLabel, options []string, tag string) (c
 		}
 
 		rowstr := util.CleanStr(t).StandardizeSpaces().TruncateText(300).ReplaceNewLine()
-		snipListItems = append(snipListItems, search.NewSearchRowItem(string(rowstr), s.Hash))
+		snipListItems = append(snipListItems, tui.NewSearchRowItem(string(rowstr), s.Hash))
 
 	}
 
-	selectedItem, err := search.SearchUI(customLabel, snipListItems)
+	selectedItem, err := tui.SearchUI(customLabel, snipListItems)
 	if err != nil {
 		return nil, err
 	}
