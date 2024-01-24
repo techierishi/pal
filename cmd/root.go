@@ -81,7 +81,7 @@ func defaultDir() string {
 
 func clipboardCheckHandler(io *InitData, next func(error)) {
 	err := clipboard.Init()
-	// config.Flag.HasClipboard = true
+	config.Flag.HasClipboard = true
 	if err != nil {
 		config.Flag.HasClipboard = false
 	}
