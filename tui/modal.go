@@ -2,86 +2,165 @@ package tui
 
 import (
 	"fmt"
-	"log"
+	"os"
+	"strings"
 
-	"github.com/awesome-gocui/gocui"
+	"github.com/charmbracelet/bubbles/textinput"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
-func Modal() {
-	g, err := gocui.NewGui(gocui.OutputNormal, true)
-	if err != nil {
-		log.Panicln(err)
-	}
-	defer g.Close()
+var (
+	focusedStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("#FFFFFF"))
+	blurredStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
+	cursorStyle         = focusedStyle.Copy()
+	noStyle             = lipgloss.NewStyle()
+	paddingLeft         = noStyle.Copy().PaddingLeft(1)
+	helpStyle           = blurredStyle.Copy()
+	cursorModeHelpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("244"))
 
-	g.SetManagerFunc(layout)
+	inputStyle = paddingLeft.Copy().Border(lipgloss.NormalBorder(), false, false, false, true).
+			BorderForeground(lipgloss.AdaptiveColor{Light: "#FFFFFF", Dark: "#EEEEEE"})
 
-	if err := setKeybindings(g); err != nil {
-		log.Panicln(err)
-	}
+	focusedButton = focusedStyle.Copy().Border(lipgloss.RoundedBorder(), true, true, true, true).
+			BorderForeground(lipgloss.AdaptiveColor{Light: "#F793FF", Dark: "#AD58B4"}).
+			Render(" Show ")
+	blurredButton = blurredStyle.Copy().Border(lipgloss.RoundedBorder(), true, true, true, true).
+			BorderForeground(lipgloss.AdaptiveColor{Light: "#999999", Dark: "#666666"}).
+			Render(" Show ")
 
-	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
-		log.Panicln(err)
-	}
+	extCode = -1
+)
+
+type inputModel struct {
+	credString string
+	hiddenText string
+	focusIndex int
+	input      textinput.Model
 }
 
-func layout(g *gocui.Gui) error {
-	maxX, maxY := g.Size()
-	if v, err := g.SetView("modal", maxX/4, maxY/4, 3*maxX/4, 3*maxY/4, 1); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
-		}
-		v.Title = "Modal Title"
-		v.Frame = true
+func initialModel(hiddenText string) inputModel {
+	m := inputModel{}
 
-		if _, err := g.SetView("textbox", maxX/4+1, maxY/4+1, 3*maxX/4-1, maxY/2-1, 1); err != nil {
-			if err != gocui.ErrUnknownView {
-				return err
+	mask := "**********"
+	t := textinput.New()
+	t.Cursor.Style = focusedStyle
+	t.Cursor.TextStyle = focusedStyle
+	t.Prompt = ""
+	t.PromptStyle = inputStyle
+	t.CharLimit = 500
+	t.Placeholder = "Password..."
+	t.SetValue(mask)
+	t.Focus()
+	m.input = t
+	m.hiddenText = hiddenText
+
+	return m
+}
+
+func (m inputModel) Init() tea.Cmd {
+	return tea.Batch(tea.EnterAltScreen)
+}
+
+func (m inputModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "ctrl+c", "esc":
+			extCode = 0
+			return m, tea.Quit
+		case "enter":
+			s := msg.String()
+			if s == "enter" && m.focusIndex == 1 {
+				m.input.SetValue(m.hiddenText)
+				return m, nil
 			}
-			// You can customize the textbox here
-			v.Editable = true
-			v.Wrap = true
-		}
 
-		if _, err := g.SetView("button", maxX/2-5, 3*maxY/4-3, maxX/2+5, 3*maxY/4-1, 1); err != nil {
-			if err != gocui.ErrUnknownView {
-				return err
+		case "tab", "shift+tab":
+			s := msg.String()
+			if s == "up" || s == "shift+tab" {
+				m.focusIndex--
+			} else {
+				m.focusIndex++
 			}
-			v.FgColor = gocui.ColorWhite
-			v.BgColor = gocui.ColorGreen
-			fmt.Fprintln(v, "OK")
+
+			if m.focusIndex > 1 {
+				m.focusIndex = 0
+			} else if m.focusIndex < 0 {
+				m.focusIndex = 1
+			}
+
+			cmds := make([]tea.Cmd, 1)
+
+			if 0 == m.focusIndex {
+				cmds[0] = m.input.Focus()
+				m.input.TextStyle = focusedStyle
+				m.input.Cursor.Style = focusedStyle
+
+			} else if 1 == m.focusIndex {
+				m.blur([]string{"input"})
+			}
+
+			return m, tea.Batch(cmds...)
 		}
 	}
-	return nil
+	cmd := m.updateInputs(msg)
+
+	return m, cmd
 }
 
-func setKeybindings(g *gocui.Gui) error {
-	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
-		return err
+func (m *inputModel) blur(inputKeys []string) {
+	for _, inputKey := range inputKeys {
+		if inputKey == "input" {
+			m.input.Blur()
+			m.input.Cursor.Style = noStyle
+			m.input.Cursor.TextStyle = noStyle
+		}
 	}
-
-	if err := g.SetKeybinding("button", gocui.KeyEnter, gocui.ModNone, submit); err != nil {
-		return err
-	}
-
-	return nil
 }
 
-func quit(g *gocui.Gui, v *gocui.View) error {
-	return gocui.ErrQuit
+func (m *inputModel) updateInputs(msg tea.Msg) tea.Cmd {
+	var cmds []tea.Cmd
+	var cmd tea.Cmd
+
+	m.input, cmd = m.input.Update(msg)
+	m.credString = m.input.Value()
+	cmds = append(cmds, cmd)
+
+	return tea.Batch(cmds...)
 }
 
-func submit(g *gocui.Gui, v *gocui.View) error {
-	textView, err := g.View("textbox")
-	if err != nil {
-		return err
+func (m inputModel) View() string {
+	var b strings.Builder
+
+	b.WriteRune('\n')
+	b.WriteString(m.input.View())
+	b.WriteRune('\n')
+
+	button := &blurredButton
+	if m.focusIndex == 1 {
+		button = &focusedButton
 	}
-	text := textView.Buffer()
+	fmt.Fprintf(&b, "\n\n%s\n\n", *button)
 
-	// Handle the submitted text here
+	b.WriteString(helpStyle.Render("[ `tab` to switch, `ctrl+c` to cancel ]"))
+	b.WriteRune('\n')
+	b.WriteString(helpStyle.Render("[ `enter` on button to show value and then copy manually]"))
+	b.WriteRune('\n')
 
-	// For now, just print the text
-	fmt.Println("Submitted Text:", text)
+	return b.String()
+}
 
-	return quit(g, v)
+func Modal(hiddenText string) *string {
+
+	m := initialModel(hiddenText)
+	if _, err := tea.NewProgram(m).Run(); err != nil {
+		fmt.Printf("could not start program: %s\n", err)
+		os.Exit(1)
+	}
+	if extCode == 0 {
+		os.Exit(extCode)
+	}
+
+	return &m.hiddenText
 }

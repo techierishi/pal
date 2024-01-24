@@ -9,6 +9,7 @@ import (
 	"github.com/techierishi/pal/credm"
 	"github.com/techierishi/pal/logr"
 	palSync "github.com/techierishi/pal/sync"
+	"github.com/techierishi/pal/tui"
 	"github.com/techierishi/pal/util"
 	"github.com/techierishi/pal/wrapper"
 )
@@ -39,6 +40,8 @@ func newFunc(cmd *cobra.Command, args []string) (err error) {
 	if err != nil {
 		return err
 	}
+
+	tui.Modal("hiddenText")
 	newCredential := credm.NewCred()
 
 	hash := util.CalculateHash(fmt.Sprintf("%s_%s", newCredential.Application, newCredential.Username))
