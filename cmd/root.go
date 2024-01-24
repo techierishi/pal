@@ -13,13 +13,19 @@ import (
 	"github.com/techierishi/pal/cmd/snip"
 	"github.com/techierishi/pal/cmd/svc"
 	"github.com/techierishi/pal/config"
+	"github.com/techierishi/pal/ds"
 	"github.com/techierishi/pal/util"
+	"golang.design/x/clipboard"
 )
 
 var (
 	configFile string
 	version    = "dev"
 )
+
+type InitData struct {
+	dir string
+}
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -73,23 +79,44 @@ func defaultDir() string {
 	return dir
 }
 
+func clipboardCheckHandler(io *InitData, next func(error)) {
+	err := clipboard.Init()
+	config.Flag.HasClipboard = true
+	if err != nil {
+		config.Flag.HasClipboard = false
+	}
+	next(nil)
+}
+
+func configLoadHandler(io *InitData, next func(error)) {
+	if configFile == "" {
+		configFile = filepath.Join(io.dir, "config.yaml")
+	}
+
+	if err := config.Conf.Load(configFile); err != nil {
+		fmt.Fprintf(os.Stderr, "%v", err)
+		os.Exit(1)
+	}
+	next(nil)
+}
+
+func initRunCheckHandler(io *InitData, next func(error)) {
+	err := util.CheckIfInitRan()
+	if err != nil {
+		os.Exit(1)
+	}
+	next(nil)
+}
+
 // initConfig reads in config file and ENV variables if set.
 func initConfig(dir string) func() {
 	return func() {
-		if configFile == "" {
-			configFile = filepath.Join(dir, "config.yaml")
-		}
-
-		if err := config.Conf.Load(configFile); err != nil {
-			fmt.Fprintf(os.Stderr, "%v", err)
-			os.Exit(1)
-		}
-
-		err := util.CheckIfInitRan()
-		if err != nil {
-			os.Exit(1)
-		}
-
+		initIO := InitData{dir: dir}
+		chain := &ds.Chain[*InitData]{}
+		chain.Use(clipboardCheckHandler)
+		chain.Use(configLoadHandler)
+		chain.Use(initRunCheckHandler)
+		chain.Execute(&initIO)
 	}
 
 }

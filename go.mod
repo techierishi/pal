@@ -3,7 +3,7 @@ module github.com/techierishi/pal
 go 1.20
 
 require (
-	github.com/atotto/clipboard v0.1.4
+	github.com/awesome-gocui/gocui v1.1.0
 	github.com/briandowns/spinner v0.0.0-20170614154858-48dbb65d7bd5
 	github.com/cbroglie/mustache v1.4.0
 	github.com/charmbracelet/bubbles v0.17.1
@@ -28,9 +28,12 @@ require (
 
 require (
 	github.com/alessio/shellescape v1.4.1 // indirect
+	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/containerd/console v1.0.4-0.20230313162750-1ae8d489ac81 // indirect
 	github.com/danieljoos/wincred v1.2.0 // indirect
+	github.com/gdamore/encoding v1.0.0 // indirect
+	github.com/gdamore/tcell/v2 v2.4.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect

@@ -7,8 +7,8 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/mitchellh/mapstructure"
 	"github.com/techierishi/pal/logr"
-	"github.com/techierishi/pal/search"
 	"github.com/techierishi/pal/svcm"
+	"github.com/techierishi/pal/tui"
 	"github.com/techierishi/pal/util"
 )
 
@@ -22,7 +22,7 @@ func clipItemList(clipData map[interface{}]interface{}) ([]list.Item, error) {
 
 	for _, clipInfo := range clipInfos.ClipInfos {
 		str := util.CleanStr(clipInfo.Content).StandardizeSpaces().TruncateText(150).ReplaceNewLine()
-		clipListItems = append(clipListItems, search.NewSearchRowItem(string(str), clipInfo.Hash))
+		clipListItems = append(clipListItems, tui.NewSearchRowItem(string(str), clipInfo.Hash))
 
 	}
 
@@ -61,11 +61,11 @@ func ClipboardList() (*ClipInfo, error) {
 		return nil, err
 	}
 
-	customLabel := search.CustomLabel{
+	customLabel := tui.CustomLabel{
 		SearchTitle:   "Clipboard",
 		EnterHelpText: "copy to clipboard",
 	}
-	selectedItem, err := search.SearchUI(customLabel, clipListItems)
+	selectedItem, err := tui.SearchUI(customLabel, clipListItems)
 
 	if err != nil {
 		return nil, err

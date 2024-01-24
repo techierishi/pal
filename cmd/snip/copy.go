@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/atotto/clipboard"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/techierishi/pal/config"
-	"github.com/techierishi/pal/search"
 	"github.com/techierishi/pal/snipm"
+	"github.com/techierishi/pal/tui"
+	"golang.design/x/clipboard"
 )
 
 // copyCmd represents the copy command
@@ -38,7 +38,7 @@ func copyFunc(cmd *cobra.Command, args []string) (err error) {
 	if flag.Query != "" {
 		options = append(options, fmt.Sprintf("--query %s", flag.Query))
 	}
-	customLabel := search.CustomLabel{
+	customLabel := tui.CustomLabel{
 		SearchTitle:   "Snippets",
 		EnterHelpText: "copy to clipboard",
 	}
@@ -50,5 +50,13 @@ func copyFunc(cmd *cobra.Command, args []string) (err error) {
 	if flag.Command && command != "" {
 		fmt.Printf("%s: %s\n", color.YellowString("Command"), command)
 	}
-	return clipboard.WriteAll(command)
+
+	if config.Flag.HasClipboard {
+		clipboard.Write(0, []byte(command))
+		fmt.Printf("%s\n", color.GreenString("Copied command to clipboard!"))
+	} else {
+		fmt.Printf("%s\n", color.RedString("Clipboard API not available in this system!"))
+	}
+
+	return nil
 }

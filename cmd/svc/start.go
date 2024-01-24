@@ -72,7 +72,12 @@ func startFunc(cmd *cobra.Command, args []string) (err error) {
 		pidLogger.Error().Any("error", err).Msg("Could not save pid")
 	}
 	defer svcDb.Delete("pid")
-	go clipm.Record()
+
+	if config.Flag.HasClipboard {
+		go clipm.Record()
+	} else {
+		logger.Info().Msg("Clipboard not supported!")
+	}
 	server := svcm.NewServer(logger)
 	server.Run()
 	logger.Info().Msg("Shutting down ...")

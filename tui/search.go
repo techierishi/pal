@@ -1,4 +1,4 @@
-package search
+package tui
 
 import (
 	"fmt"
