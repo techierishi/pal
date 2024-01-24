@@ -61,14 +61,16 @@ func PassSearch() error {
 		fmt.Printf("%s\n", color.RedString("Keyring not supported on this os!"))
 	}
 
-	if config.Flag.HasClipboard {
-		clipboard.Write(0, []byte(passwd))
-		fmt.Printf("%s\n", color.GreenString("Copied credential to clipboard!"))
-	}
-
 	// Update the timestamp to show the mostly used item on top
 	selectedCred.Timestamp = util.UnixMilli()
 	credDb.Upsert(fmt.Sprintf("%s.%s", CRED_TBL, selectedItem.Index()), selectedCred)
+
+	if config.Flag.HasClipboard {
+		clipboard.Write(0, []byte(passwd))
+		fmt.Printf("%s\n", color.GreenString("Copied credential to clipboard!"))
+	} else {
+		tui.PasswordModal(passwd)
+	}
 
 	return nil
 }
