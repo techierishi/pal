@@ -49,6 +49,9 @@ func execFunc(cmd *cobra.Command, args []string) (err error) {
 		if config.Flag.HasClipboard {
 			clipboard.Write(0, []byte(command))
 			fmt.Printf("%s\n", color.GreenString("Copied selected command!"))
+		} else {
+			fmt.Printf("%s\n", color.RedString("Clipboard API not available in this system!"))
+
 		}
 		return nil
 	}
