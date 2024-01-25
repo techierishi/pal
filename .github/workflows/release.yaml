@@ -43,7 +43,7 @@ jobs:
           		-v /var/run/docker.sock:/var/run/docker.sock \
           		-v `pwd`:/go/src/$(PACKAGE_NAME) \
           		-w /go/src/$(PACKAGE_NAME) \
-          		ghcr.io/goreleaser/goreleaser-cross:${GOLANG_CROSS_VERSION} \
+          		techierishi/goreleaser-cross:${GOLANG_CROSS_VERSION} \
           		--clean --skip=validate --snapshot
         env:
           PACKAGE_NAME: github.com/techierishi/pal
