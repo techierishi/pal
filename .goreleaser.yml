@@ -21,35 +21,46 @@ brews:
     test: |
       system "#{bin}/pal"
 builds:
-  - id: darwin-amd64
+  - id: windows-amd64
+    binary: pal-windows-{{ .Arch }}
     main: main.go
-    binary: pal
     goos:
-      - darwin
+      - windows
     goarch:
       - amd64
-    env:
-      - CC=o64-clang
-      - CXX=o64-clang++
     ldflags:
-      -s -w -X 'github.com/techierishi/pal/versioning.Version=v{{ .Version }}'
+      - -buildmode=exe
+      - "{{ .Env.LDFLAGS }}"
 
-  - id: darwin-arm64
-    main: main.go
-    binary: pal
-    goos:
-      - darwin
-    goarch:
-      - arm64
-    env:
-      - CC=oa64-clang
-      - CXX=oa64-clang++
-    ldflags:
-      -s -w -X 'github.com/techierishi/pal/versioning.Version=v{{ .Version }}'
+  # - id: darwin-amd64
+  #   main: main.go
+  #   binary: pal-darwin-{{ .Arch }}
+  #   goos:
+  #     - darwin
+  #   goarch:
+  #     - amd64
+  #   env:
+  #     - CC=o64-clang
+  #     - CXX=o64-clang++
+  #   ldflags:
+  #     -s -w -X 'github.com/techierishi/pal/versioning.Version=v{{ .Version }}'
+
+  # - id: darwin-arm64
+  #   main: main.go
+  #   binary: pal-darwin-{{ .Arch }}
+  #   goos:
+  #     - darwin
+  #   goarch:
+  #     - arm64
+  #   env:
+  #     - CC=oa64-clang
+  #     - CXX=oa64-clang++
+  #   ldflags:
+  #     -s -w -X 'github.com/techierishi/pal/versioning.Version=v{{ .Version }}'
 
   - id: linux-amd64
     main: main.go
-    binary: pal
+    binary: pal-linux-{{ .Arch }}
     goos:
       - linux
     goarch:
@@ -66,7 +77,7 @@ builds:
 
   - id: linux-arm64
     main: main.go
-    binary: pal
+    binary: pal-linux-{{ .Arch }}
     goos:
       - linux
     goarch:
