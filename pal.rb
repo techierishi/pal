@@ -5,53 +5,22 @@
 class Pal < Formula
   desc "Simple command-line snippet manager"
   homepage "https://github.com/techierishi/pal"
-  version "0.2.0"
-
-  depends_on "fzf"
-
-  on_macos do
-    if Hardware::CPU.arm?
-      url "https://github.com/techierishi/pal/releases/download/v0.2.0/pal_0.2.0_darwin_arm64.tar.gz"
-      sha256 "9db684cb416274105ac05f04ee0a7a8d894c66628d925ca39ca11d5dacd9b494"
-
-      def install
-        bin.install Dir['pal']
-        zsh_completion.install "misc/completions/zsh/_pal"
-      end
-    end
-    if Hardware::CPU.intel?
-      url "https://github.com/techierishi/pal/releases/download/v0.2.0/pal_0.2.0_darwin_amd64.tar.gz"
-      sha256 "9eb7b1a96886d0a5e57d2b6a820ed9ef6553a74bbd23ab1a5d6887f65bb3887d"
-
-      def install
-        bin.install Dir['pal']
-        zsh_completion.install "misc/completions/zsh/_pal"
-      end
-    end
-  end
+  version "0.2.7"
+  depends_on :linux
 
   on_linux do
-    if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/techierishi/pal/releases/download/v0.2.0/pal_0.2.0_linux_arm64.tar.gz"
-      sha256 "31b8be4be6aba2f95b4b2e9037e284e27b81300e75fc14e36e5a2ad884e54df1"
-
-      def install
-        bin.install Dir['pal']
-        zsh_completion.install "misc/completions/zsh/_pal"
-      end
-    end
-    if Hardware::CPU.arm? && !Hardware::CPU.is_64_bit?
-      url "https://github.com/techierishi/pal/releases/download/v0.2.0/pal_0.2.0_linux_armv6.tar.gz"
-      sha256 "231e83fd396a99c987a9491bb25fe5f92aae1a12bd7c41271dc7b142846943fe"
-
-      def install
-        bin.install Dir['pal']
-        zsh_completion.install "misc/completions/zsh/_pal"
-      end
-    end
     if Hardware::CPU.intel?
-      url "https://github.com/techierishi/pal/releases/download/v0.2.0/pal_0.2.0_linux_amd64.tar.gz"
-      sha256 "e87ebbb23728203ea94411db6d3283add2fc7782fac1e92dbfca7d0d86c9c6f8"
+      url "https://github.com/techierishi/pal/releases/download/v0.2.7/pal_0.2.7_linux_amd64.tar.gz"
+      sha256 "80c902971cbd5c6c60256e0b59027e53056e9f2d160e6d97d6d7ab13ef5c6952"
+
+      def install
+        bin.install Dir['pal']
+        zsh_completion.install "misc/completions/zsh/_pal"
+      end
+    end
+    if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
+      url "https://github.com/techierishi/pal/releases/download/v0.2.7/pal_0.2.7_linux_arm64.tar.gz"
+      sha256 "522d20e9df43bffb7fa2ce637fbc12c57a885ca2ce528fbf5607d8ffe1854478"
 
       def install
         bin.install Dir['pal']
