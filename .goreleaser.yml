@@ -30,7 +30,7 @@ builds:
       - amd64
     ldflags:
       - -buildmode=exe
-      - "{{ .Env.LDFLAGS }}"
+      - -s -w -X 'github.com/techierishi/pal/versioning.Version=v{{ .Version }}'
 
   # - id: darwin-amd64
   #   main: main.go
