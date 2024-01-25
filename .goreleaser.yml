@@ -5,6 +5,10 @@ release:
     owner: techierishi
     name: pal
   name_template: '{{.Tag}}'
+  replace_existing_draft: true
+  mode: append
+  skip_upload: false
+
 brews:
   -
     tap:
