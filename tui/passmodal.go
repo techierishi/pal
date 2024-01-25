@@ -100,7 +100,7 @@ func (m inputModel) View() string {
 
 	b.WriteString(helpStyle.Render("[ This system does not support clipboard API]"))
 	b.WriteRune('\n')
-	b.WriteString(helpStyle.Render("[ press `shift` to show value and then copy manually]"))
+	b.WriteString(helpStyle.Render("[ press `enter` to show value and then copy manually]"))
 	b.WriteRune('\n')
 	b.WriteString(helpStyle.Render("[ `esc` to exit ]"))
 	b.WriteRune('\n')
