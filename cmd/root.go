@@ -12,6 +12,7 @@ import (
 	"github.com/techierishi/pal/cmd/hist"
 	"github.com/techierishi/pal/cmd/snip"
 	"github.com/techierishi/pal/cmd/svc"
+	"github.com/techierishi/pal/cmd/sync"
 	"github.com/techierishi/pal/config"
 	"github.com/techierishi/pal/ds"
 	"github.com/techierishi/pal/util"
@@ -55,6 +56,7 @@ func init() {
 	RootCmd.AddCommand(svc.RootCmdSvc)
 	RootCmd.AddCommand(hist.RootCmdHist)
 	RootCmd.AddCommand(alias.RootCmdAlias)
+	RootCmd.AddCommand(sync.RootCmdSync)
 
 	RootCmd.PersistentFlags().StringVar(&configFile, "config", "", fmt.Sprintf("config file (default is %s )", dir))
 	RootCmd.PersistentFlags().BoolVarP(&config.Flag.Debug, "debug", "", false, "debug mode")

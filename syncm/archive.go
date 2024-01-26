@@ -1,4 +1,4 @@
-package sync
+package syncm
 
 import (
 	"fmt"
@@ -74,7 +74,7 @@ func RestoreFiles(bkpFilePath string, restoreDir string) error {
 	return nil
 }
 
-func BackupFiles(filesPaths []string, outputPath string) error {
+func BackupFiles(syncFiles SyncInfos, outputPath string) error {
 
 	s := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
 	s.Suffix = " Saving backup..."
@@ -110,15 +110,15 @@ func BackupFiles(filesPaths []string, outputPath string) error {
 		return err
 	}
 
-	for _, filePath := range filesPaths {
+	for _, syncFile := range syncFiles.Files {
 
-		content, err := readFile(filePath)
+		content, err := readFile(syncFile.FilePath)
 		if err != nil {
 			fmt.Println("Error reading file:", err)
 			continue
 		}
 
-		dirPath := filepath.Dir(filePath)
+		dirPath := filepath.Dir(syncFile.FilePath)
 		if !strings.HasPrefix(dirPath, homeDir) || !strings.HasPrefix(dirPath, confDir) {
 			fmt.Println("Only filepath from home or config folder is supported for backup. Skipping... ", dirPath)
 			continue
@@ -130,7 +130,7 @@ func BackupFiles(filesPaths []string, outputPath string) error {
 		fileData := FileInfo{
 			Metadata: map[string]string{
 				"path": dirPath,
-				"name": filepath.Base(filePath),
+				"name": filepath.Base(syncFile.FilePath),
 			},
 			FileContent: string(content),
 		}

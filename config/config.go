@@ -31,6 +31,7 @@ type GeneralConfig struct {
 	BackupFile    string `yaml:"backupfile"`
 	ClipboardFile string `yaml:"clipboardfile"`
 	SvcFile       string `yaml:"svcfile"`
+	SyncFile      string `yaml:"syncfile"`
 	// General purpose app state
 	StateFile string   `yaml:"statefile"`
 	Editor    string   `yaml:"editor"`
@@ -119,13 +120,19 @@ func (cfg *Config) Load(file string) error {
 		return errors.Wrap(err, "Failed to get the default config directory")
 	}
 	cfg.Daemon.Port = 7200
+	cfg.General.BackupFile = filepath.Join(dir, "pal-backups.yaml")
 	cfg.General.SnippetFile = filepath.Join(dir, "snippet.yaml")
 	cfg.General.CredFile = filepath.Join(dir, "credential.yaml")
 	cfg.General.AliasFile = filepath.Join(dir, "alias.yaml")
-	cfg.General.BackupFile = filepath.Join(dir, "pal-backups.yaml")
 	cfg.General.ClipboardFile = filepath.Join(dir, "clipboard.yaml")
 	cfg.General.StateFile = filepath.Join(dir, "state.yaml")
+
 	cfg.General.SvcFile = filepath.Join(dir, "svc.yaml")
+	cfg.General.SyncFile = filepath.Join(dir, "sync.yaml")
+	err = Touch(cfg.General.SyncFile)
+	if err != nil {
+		return err
+	}
 
 	cfg.General.Editor = os.Getenv("EDITOR")
 	if cfg.General.Editor == "" && runtime.GOOS != "windows" {
@@ -196,4 +203,15 @@ func isCommandAvailable(name string) bool {
 		return false
 	}
 	return true
+}
+
+func Touch(fileName string) error {
+	if _, err := os.Stat(fileName); os.IsNotExist(err) {
+		file, err := os.Create(fileName)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+	}
+	return nil
 }

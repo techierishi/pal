@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/techierishi/pal/config"
-	palSync "github.com/techierishi/pal/sync"
+	"github.com/techierishi/pal/syncm"
 	"github.com/techierishi/pal/util"
 )
 
@@ -42,7 +42,7 @@ func editFunc(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	if config.Conf.Gist.AutoSync {
-		return palSync.AutoSync(config.Conf.General.BackupFile)
+		return syncm.AutoSync(config.Conf.General.BackupFile)
 	}
 
 	return nil

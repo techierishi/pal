@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 	"github.com/techierishi/pal/config"
-	palSync "github.com/techierishi/pal/sync"
+	"github.com/techierishi/pal/syncm"
 )
 
 // backupCmd represents the backup command
@@ -20,9 +20,7 @@ func init() {
 
 func backupFunc(cmd *cobra.Command, args []string) (err error) {
 
-	return palSync.BackupFiles([]string{
-		config.Conf.General.SnippetFile,
-		config.Conf.General.CredFile,
-		config.Conf.General.AliasFile,
-	}, config.Conf.General.BackupFile)
+	syncInfos := syncm.SyncInfos{}
+	syncInfos.Load()
+	return syncm.BackupFiles(syncInfos, config.Conf.General.BackupFile)
 }

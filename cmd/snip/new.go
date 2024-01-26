@@ -8,7 +8,7 @@ import (
 	"github.com/techierishi/pal/config"
 	"github.com/techierishi/pal/logr"
 	"github.com/techierishi/pal/snipm"
-	palSync "github.com/techierishi/pal/sync"
+	"github.com/techierishi/pal/syncm"
 	"github.com/techierishi/pal/util"
 )
 
@@ -51,7 +51,7 @@ func newFunc(cmd *cobra.Command, args []string) (err error) {
 	fmt.Fprintf(color.Output, "%12s", color.GreenString("Snippet saved! \n"))
 
 	if config.Conf.Gist.AutoSync {
-		return palSync.AutoSync(config.Conf.General.BackupFile)
+		return syncm.AutoSync(config.Conf.General.BackupFile)
 	}
 
 	return nil
