@@ -72,7 +72,10 @@ Use "pal snip [command] --help" for more information about a command.
 
 ```
 ## Snippet demo
-[![Snippet Demo](https://img.youtube.com/vi/_1TxNmnTArY/maxresdefault.jpg)](https://youtu.be/_1TxNmnTArY)
+
+https://github.com/techierishi/pal/assets/7880021/ba677979-f399-474c-a1c2-7e19bc73eaf1
+
+
 
 ## Shell history usage
 
@@ -93,7 +96,10 @@ Global Flags:
 ```
 
 ## Shell history demo
-[![Shell history demo](https://img.youtube.com/vi/wlgeyqcLLdc/maxresdefault.jpg)](https://youtu.be/wlgeyqcLLdc)
+
+https://github.com/techierishi/pal/assets/7880021/c79aee98-4160-4105-a0fc-5463d5ee0b70
+
+
 
 ## Clipboard usage
 
@@ -117,7 +123,8 @@ Use "pal clip [command] --help" for more information about a command.
 ```
 
 ## Clipboard demo
-[![Clipboard demo](https://img.youtube.com/vi/oLKWGm4od7c/maxresdefault.jpg)](https://youtu.be/oLKWGm4od7c)
+
+https://github.com/techierishi/pal/assets/7880021/8878ef0c-daa4-47d9-aae0-c9436cac9d61
 
 ## Credential usage
 
@@ -145,7 +152,9 @@ Global Flags:
 Use "pal cred [command] --help" for more information about a command.
 ```
 ## Credential manager demo
-[![Credential manager demo](https://img.youtube.com/vi/Aq59JX6Er1E/maxresdefault.jpg)](https://youtu.be/Aq59JX6Er1E)
+
+https://github.com/techierishi/pal/assets/7880021/8ff7d8aa-bf41-4fb9-a9a7-44d241913721
+
 
 ## Installation
 
