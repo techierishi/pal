@@ -54,22 +54,17 @@ func RestoreFiles(bkpFilePath string, restoreDir string) error {
 		if _, ok := data.Metadata["name"]; !ok {
 			continue
 		}
-		var fileWritePath string
-
 		dirPath := data.Metadata["path"]
-		if !strings.HasPrefix(dirPath, "<home>") && !strings.HasPrefix(dirPath, "<config>") {
-			fmt.Println("Only filepath from home or config folder is supported for restore. Skipping... ", dirPath)
+		fileName := data.Metadata["name"]
+		dirPath, dirCheck := ReplaceDirFromSign(dirPath, homeDir, confDir)
+		if !dirCheck {
 			continue
 		}
-		dirPath = strings.Replace(dirPath, "~", homeDir, 1)
+		fileWritePath := filepath.Join(dirPath, fileName)
 
-		dirPath = strings.Replace(dirPath, "<config>", confDir, 1)
-		dirPath = strings.Replace(dirPath, "<home>", homeDir, 1)
-
-		fileWritePath = filepath.Join(dirPath, data.Metadata["name"])
 		err = os.WriteFile(fileWritePath, []byte(data.FileContent), os.ModePerm)
 
-		fmt.Printf("Restored file: %s\n", data.Metadata["name"])
+		fmt.Printf("Restored file: %s\n", fileName)
 	}
 	return nil
 }
@@ -111,22 +106,16 @@ func BackupFiles(syncFiles SyncInfos, outputPath string) error {
 	}
 
 	for _, syncFile := range syncFiles.Files {
-
 		content, err := readFile(syncFile.FilePath)
 		if err != nil {
 			fmt.Println("Error reading file:", err)
 			continue
 		}
 
-		dirPath := filepath.Dir(syncFile.FilePath)
-		if !strings.HasPrefix(dirPath, homeDir) || !strings.HasPrefix(dirPath, confDir) {
-			fmt.Println("Only filepath from home or config folder is supported for backup. Skipping... ", dirPath)
+		dirPath, dirCheck := ReplaceDirToSign(syncFile.FilePath, homeDir, confDir)
+		if !dirCheck {
 			continue
 		}
-
-		dirPath = strings.Replace(dirPath, confDir, "<config>", 1)
-		dirPath = strings.Replace(dirPath, homeDir, "<home>", 1)
-
 		fileData := FileInfo{
 			Metadata: map[string]string{
 				"path": dirPath,
@@ -148,6 +137,31 @@ func BackupFiles(syncFiles SyncInfos, outputPath string) error {
 	s.Stop()
 	fmt.Fprintf(color.Output, "%12s", color.GreenString(fmt.Sprintf("Backup file created successfully. \n")))
 	return nil
+}
+
+func ReplaceDirToSign(filePath string, homeDir string, confDir string) (string, bool) {
+	dirPath := filepath.Dir(filePath)
+	if !strings.HasPrefix(dirPath, homeDir) && !strings.HasPrefix(dirPath, confDir) {
+		fmt.Println("Only filepath from home or config folder is supported for backup. Skipping... ", dirPath)
+		return "", false
+	}
+
+	dirPath = strings.Replace(dirPath, confDir, "<config>", 1)
+	dirPath = strings.Replace(dirPath, homeDir, "<home>", 1)
+	return dirPath, true
+}
+
+func ReplaceDirFromSign(dirPath string, homeDir string, confDir string) (string, bool) {
+	if !strings.HasPrefix(dirPath, "<home>") && !strings.HasPrefix(dirPath, "<config>") {
+		fmt.Println("Only filepath from home or config folder is supported for restore. Skipping... ", dirPath)
+		return "", false
+	}
+
+	dirPath = strings.Replace(dirPath, "~", homeDir, 1)
+	dirPath = strings.Replace(dirPath, "<config>", confDir, 1)
+	dirPath = strings.Replace(dirPath, "<home>", homeDir, 1)
+
+	return dirPath, true
 }
 
 func readFile(filePath string) ([]byte, error) {

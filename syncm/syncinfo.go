@@ -24,11 +24,23 @@ type SyncInfo struct {
 func (backups *SyncInfos) Load() error {
 	logger := logr.GetLogInstance()
 
-	bkpFilePath := config.Conf.General.BackupFile
-	if _, err := os.Stat(bkpFilePath); os.IsNotExist(err) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println("RestoreFiles:: Error getting user home directory:", err)
+		return err
+	}
+
+	confDir, err := config.GetUserConfigDir()
+	if err != nil {
+		fmt.Println("RestoreFiles:: Error getting user config directory:", err)
+		return err
+	}
+
+	syncFilePath := config.Conf.General.SyncFile
+	if _, err := os.Stat(syncFilePath); os.IsNotExist(err) {
 		return nil
 	}
-	syncFile, err := os.OpenFile(bkpFilePath, os.O_RDONLY, 0600)
+	syncFile, err := os.OpenFile(syncFilePath, os.O_RDONLY, 0600)
 	if err != nil {
 		logger.Error().Any("error opening/creating file: %v", err)
 		return err
@@ -44,6 +56,16 @@ func (backups *SyncInfos) Load() error {
 		return fmt.Errorf("Failed to load backup file. %v", err)
 	}
 
+	// replace signs
+	for idx, fileInfo := range backups.Files {
+		dirPath, dirCheck := ReplaceDirFromSign(fileInfo.FilePath, homeDir, confDir)
+		if !dirCheck {
+			continue
+		}
+		backups.Files[idx].FilePath = dirPath
+
+	}
+
 	backups.Files = append(backups.Files, SyncInfo{
 		FilePath: config.Conf.General.SnippetFile,
 	})
@@ -53,6 +75,7 @@ func (backups *SyncInfos) Load() error {
 	backups.Files = append(backups.Files, SyncInfo{
 		FilePath: config.Conf.General.AliasFile,
 	})
+
 	backups.Order()
 	return nil
 }
