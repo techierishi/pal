@@ -26,13 +26,13 @@ func (backups *SyncInfos) Load() error {
 
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		fmt.Println("RestoreFiles:: Error getting user home directory:", err)
+		fmt.Println("Load:: Error getting user home directory:", err)
 		return err
 	}
 
 	confDir, err := config.GetUserConfigDir()
 	if err != nil {
-		fmt.Println("RestoreFiles:: Error getting user config directory:", err)
+		fmt.Println("Load:: Error getting user config directory:", err)
 		return err
 	}
 
@@ -58,14 +58,14 @@ func (backups *SyncInfos) Load() error {
 
 	// replace signs
 	for idx, fileInfo := range backups.Files {
-		dirPath, dirCheck := ReplaceDirFromSign(fileInfo.FilePath, homeDir, confDir)
+		fullPath, dirCheck := ReplaceDirFromSign(fileInfo.FilePath, homeDir, confDir)
 		if !dirCheck {
 			continue
 		}
-		backups.Files[idx].FilePath = dirPath
-
+		backups.Files[idx].FilePath = fullPath
 	}
 
+	// Adding pal files by default
 	backups.Files = append(backups.Files, SyncInfo{
 		FilePath: config.Conf.General.SnippetFile,
 	})
@@ -75,6 +75,11 @@ func (backups *SyncInfos) Load() error {
 	backups.Files = append(backups.Files, SyncInfo{
 		FilePath: config.Conf.General.AliasFile,
 	})
+	backups.Files = append(backups.Files, SyncInfo{
+		FilePath: config.Conf.General.SyncFile,
+	})
+
+	backups.Files = removeDuplicate(backups.Files)
 
 	backups.Order()
 	return nil
@@ -113,4 +118,16 @@ func (backups *SyncInfos) Reverse() {
 	for i, j := 0, len(backups.Files)-1; i < j; i, j = i+1, j-1 {
 		backups.Files[i], backups.Files[j] = backups.Files[j], backups.Files[i]
 	}
+}
+
+func removeDuplicate(sliceList []SyncInfo) []SyncInfo {
+	allKeys := make(map[string]bool)
+	list := []SyncInfo{}
+	for _, item := range sliceList {
+		if _, value := allKeys[item.FilePath]; !value {
+			allKeys[item.FilePath] = true
+			list = append(list, item)
+		}
+	}
+	return list
 }
