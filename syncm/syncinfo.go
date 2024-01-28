@@ -21,8 +21,22 @@ type SyncInfo struct {
 }
 
 // Load reads yaml file.
-func (backups *SyncInfos) Load() error {
+func (syncInfos *SyncInfos) Load() error {
 	logger := logr.GetLogInstance()
+
+	// Adding pal files by default
+	syncInfos.Files = append(syncInfos.Files, SyncInfo{
+		FilePath: config.Conf.General.SnippetFile,
+	})
+	syncInfos.Files = append(syncInfos.Files, SyncInfo{
+		FilePath: config.Conf.General.CredFile,
+	})
+	syncInfos.Files = append(syncInfos.Files, SyncInfo{
+		FilePath: config.Conf.General.AliasFile,
+	})
+	syncInfos.Files = append(syncInfos.Files, SyncInfo{
+		FilePath: config.Conf.General.SyncFile,
+	})
 
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -36,87 +50,73 @@ func (backups *SyncInfos) Load() error {
 		return err
 	}
 
-	syncFilePath := config.Conf.General.SyncFile
-	if _, err := os.Stat(syncFilePath); os.IsNotExist(err) {
+	syncInfoFilePath := config.Conf.General.SyncFile
+	if _, err := os.Stat(syncInfoFilePath); os.IsNotExist(err) {
 		return nil
 	}
-	syncFile, err := os.OpenFile(syncFilePath, os.O_RDONLY, 0600)
+	syncInfoFile, err := os.OpenFile(syncInfoFilePath, os.O_RDONLY, 0600)
 	if err != nil {
 		logger.Error().Any("error opening/creating file: %v", err)
 		return err
 	}
-	defer syncFile.Close()
-	dec := yaml.NewDecoder(syncFile)
-	err = dec.Decode(&backups)
+	defer syncInfoFile.Close()
+	dec := yaml.NewDecoder(syncInfoFile)
+	err = dec.Decode(&syncInfos)
 	if err != nil {
 		if err == io.EOF {
-			fmt.Println("SyncInfos file is empty.")
 			return nil
 		}
-		return fmt.Errorf("Failed to load backup file. %v", err)
+		logger.Error().Any("Failed to load syncInfo file. %v", err)
+		return err
 	}
 
 	// replace signs
-	for idx, fileInfo := range backups.Files {
+	for idx, fileInfo := range syncInfos.Files {
 		fullPath, dirCheck := ReplaceDirFromSign(fileInfo.FilePath, homeDir, confDir)
 		if !dirCheck {
 			continue
 		}
-		backups.Files[idx].FilePath = fullPath
+		syncInfos.Files[idx].FilePath = fullPath
 	}
 
-	// Adding pal files by default
-	backups.Files = append(backups.Files, SyncInfo{
-		FilePath: config.Conf.General.SnippetFile,
-	})
-	backups.Files = append(backups.Files, SyncInfo{
-		FilePath: config.Conf.General.CredFile,
-	})
-	backups.Files = append(backups.Files, SyncInfo{
-		FilePath: config.Conf.General.AliasFile,
-	})
-	backups.Files = append(backups.Files, SyncInfo{
-		FilePath: config.Conf.General.SyncFile,
-	})
+	syncInfos.Files = removeDuplicate(syncInfos.Files)
 
-	backups.Files = removeDuplicate(backups.Files)
-
-	backups.Order()
+	syncInfos.Order()
 	return nil
 }
 
-// Save saves the backups to yaml file.
-func (backups *SyncInfos) Save() error {
-	syncFile := config.Conf.General.BackupFile
-	f, err := os.Create(syncFile)
+// Save saves the syncInfos to yaml file.
+func (syncInfos *SyncInfos) Save() error {
+	syncInfo := config.Conf.General.BackupFile
+	f, err := os.Create(syncInfo)
 	defer f.Close()
 	if err != nil {
-		return fmt.Errorf("Failed to save backup file. err: %s", err)
+		return fmt.Errorf("Failed to save syncInfo file. err: %s", err)
 	}
-	return yaml.NewEncoder(f).Encode(backups)
+	return yaml.NewEncoder(f).Encode(syncInfos)
 }
 
-func (backups *SyncInfos) ToString() (string, error) {
+func (syncInfos *SyncInfos) ToString() (string, error) {
 	var buffer bytes.Buffer
-	err := yaml.NewEncoder(&buffer).Encode(backups)
+	err := yaml.NewEncoder(&buffer).Encode(syncInfos)
 	if err != nil {
 		return "", fmt.Errorf("Failed to convert struct to yaml string: %v", err)
 	}
 	return buffer.String(), nil
 }
 
-func (backups *SyncInfos) Order() {
+func (syncInfos *SyncInfos) Order() {
 	sortBy := config.Conf.General.SortBy
 	switch {
 
 	case sortBy == "-recency":
-		backups.Reverse()
+		syncInfos.Reverse()
 	}
 }
 
-func (backups *SyncInfos) Reverse() {
-	for i, j := 0, len(backups.Files)-1; i < j; i, j = i+1, j-1 {
-		backups.Files[i], backups.Files[j] = backups.Files[j], backups.Files[i]
+func (syncInfos *SyncInfos) Reverse() {
+	for i, j := 0, len(syncInfos.Files)-1; i < j; i, j = i+1, j-1 {
+		syncInfos.Files[i], syncInfos.Files[j] = syncInfos.Files[j], syncInfos.Files[i]
 	}
 }
 

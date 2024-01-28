@@ -11,10 +11,12 @@ import (
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
 	"github.com/techierishi/pal/config"
+	"github.com/techierishi/pal/logr"
 	"gopkg.in/yaml.v3"
 )
 
 func RestoreFiles(bkpFilePath string, restoreDir string) error {
+	logger := logr.GetLogInstance()
 
 	if _, err := os.Stat(bkpFilePath); err != nil {
 		fmt.Println("Restore file path does not exist.")
@@ -47,7 +49,7 @@ func RestoreFiles(bkpFilePath string, restoreDir string) error {
 		if err := decoder.Decode(&data); err == io.EOF {
 			break
 		} else if err != nil {
-			fmt.Println("Error decoding data:", err)
+			logger.Error().Any("RestoreFiles:: Error decoding data", err)
 			return err
 		}
 
@@ -70,7 +72,7 @@ func RestoreFiles(bkpFilePath string, restoreDir string) error {
 }
 
 func BackupFiles(syncFiles SyncInfos, outputPath string) error {
-
+	logger := logr.GetLogInstance()
 	s := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
 	s.Suffix = " Saving backup..."
 	s.Start()
@@ -108,7 +110,7 @@ func BackupFiles(syncFiles SyncInfos, outputPath string) error {
 	for _, syncFile := range syncFiles.Files {
 		content, err := readFile(syncFile.FilePath)
 		if err != nil {
-			fmt.Println("Error reading file:", err)
+			logger.Error().Any("BackupFiles:: Error reading file", err)
 			continue
 		}
 
@@ -124,13 +126,13 @@ func BackupFiles(syncFiles SyncInfos, outputPath string) error {
 			FileContent: string(content),
 		}
 		if err := encoder.Encode(fileData); err != nil {
-			fmt.Println("Error encoding data:", err)
+			logger.Error().Any("BackupFiles:: Error encoding data", err)
 			return err
 		}
 	}
 
 	if err := copyFile(config.Conf.General.BackupFile, filepath.Base(config.Conf.General.BackupFile)); err != nil {
-		fmt.Println("Error creating backup:", err)
+		logger.Error().Any("BackupFiles:: Error creating backup", err)
 		return err
 	}
 
