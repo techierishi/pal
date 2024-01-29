@@ -44,7 +44,6 @@ func startFunc(cmd *cobra.Command, args []string) (err error) {
 	defer svcDb.Close()
 	d := svcm.Daemon{Logger: logger}
 	logger.Info().
-		Str("version", version).
 		Str("commit", commit).Msg("Daemon starting ...")
 
 	pidLogger := logger.With().Int("daemonPID", os.Getpid()).Logger()

@@ -7,11 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	configFile string
-	version    = "dev"
-)
-
 var RootCmdSnip = &cobra.Command{
 	Use:           "snip",
 	Short:         "Simple command-line snippet manager.",

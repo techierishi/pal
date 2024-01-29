@@ -21,7 +21,7 @@ import (
 
 var (
 	configFile string
-	version    = "dev"
+	version    = "0.2.7"
 )
 
 type InitData struct {

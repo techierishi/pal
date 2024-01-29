@@ -7,11 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	configFile string
-	version    = "dev"
-)
-
 var RootCmdCred = &cobra.Command{
 	Use:           "cred",
 	Short:         "Simple credential manager.",

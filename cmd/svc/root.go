@@ -7,11 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	configFile string
-	version    = "dev"
-)
-
 var RootCmdSvc = &cobra.Command{
 	Use:           "svc",
 	Short:         "Pal backgroud service.",

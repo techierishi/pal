@@ -12,11 +12,6 @@ import (
 	"golang.design/x/clipboard"
 )
 
-var (
-	configFile string
-	version    = "dev"
-)
-
 var RootCmdHist = &cobra.Command{
 	Use:           "hist",
 	Short:         "Simple shell history manager.",

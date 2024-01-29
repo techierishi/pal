@@ -7,11 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	configFile string
-	version    = "dev"
-)
-
 var RootCmdAlias = &cobra.Command{
 	Use:           "alias",
 	Short:         "Simple alias manager.",

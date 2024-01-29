@@ -7,11 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	configFile string
-	version    = "dev"
-)
-
 var RootCmdClip = &cobra.Command{
 	Use:           "clip",
 	Short:         "Simple clipboard manager.",
