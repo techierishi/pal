@@ -8,7 +8,7 @@ import (
 	"github.com/techierishi/pal/config"
 	"github.com/techierishi/pal/credm"
 	"github.com/techierishi/pal/logr"
-	palSync "github.com/techierishi/pal/sync"
+	"github.com/techierishi/pal/syncm"
 	"github.com/techierishi/pal/util"
 	"github.com/techierishi/pal/wrapper"
 )
@@ -61,7 +61,7 @@ func newFunc(cmd *cobra.Command, args []string) (err error) {
 	fmt.Fprintf(color.Output, "%12s", color.GreenString("Credential saved! \n"))
 
 	if config.Conf.Gist.AutoSync {
-		return palSync.AutoSync(config.Conf.General.BackupFile)
+		return syncm.AutoSync(config.Conf.General.BackupFile)
 	}
 
 	return nil

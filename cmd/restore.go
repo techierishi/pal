@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/techierishi/pal/config"
-	palSync "github.com/techierishi/pal/sync"
+	"github.com/techierishi/pal/syncm"
 )
 
 var restorePath string
@@ -38,5 +38,5 @@ func restoreFunc(cmd *cobra.Command, args []string) (err error) {
 		fmt.Fprintf(os.Stderr, "Please pass path to restore file using `--path`")
 		os.Exit(0)
 	}
-	return palSync.RestoreFiles(restorePath, dir)
+	return syncm.RestoreFiles(restorePath, dir)
 }
