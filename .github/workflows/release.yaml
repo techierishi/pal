@@ -64,12 +64,10 @@ jobs:
           Compress-Archive -Path "$AppName-arm64.exe" -DestinationPath "$AppName-$Version-win-arm64.zip"
           ls
           cd ..
-          echo ${GITHUB_TOKEN} | gh auth login --with-token
+          echo ${{ secrets.PAL_PAT }} | gh auth login --with-token
           gh release create $Version "$OutputDir\$AppName-$Version-win-amd64.zip" -t "Release $Version amd64"
           gh release create $Version "$OutputDir\$AppName-$Version-win-arm64.zip" -t "Release $Version arm64"
 
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAL_PAT }}
   
       - name: Generate binary on Ubuntu
         if: matrix.os == 'ubuntu-20.04'
@@ -88,11 +86,9 @@ jobs:
           zip $APP_NAME-$VERSION-linux-arm64.zip $APP_NAME-linux-amd64
           ls -lart
           cd ..
-          echo ${GITHUB_TOKEN} | gh auth login --with-token
+          echo ${{ secrets.PAL_PAT }} | gh auth login --with-token
           gh release create $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-linux-amd64.zip -t "Release $VERSION amd64"
           gh release create $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-linux-arm64.zip -t "Release $VERSION arm64"
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAL_PAT }}
 
       - name: Generate binary on Mac
         if: matrix.os == 'macos-latest'
@@ -111,8 +107,6 @@ jobs:
           zip $APP_NAME-$VERSION-darwin-arm64.zip $APP_NAME-darwin-amd64
           ls -lart
           cd ..
-          echo ${GITHUB_TOKEN} | gh auth login --with-token
+          echo ${{ secrets.PAL_PAT }} | gh auth login --with-token
           gh release create $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-darwin-amd64.zip -t "Release $VERSION amd64"
           gh release create $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-darwin-arm64.zip -t "Release $VERSION arm64"
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAL_PAT }}
