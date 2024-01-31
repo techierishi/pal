@@ -5,6 +5,23 @@ on:
       - "v*"
   workflow_dispatch:
 jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Create release draft
+        run: |
+          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+          && sudo apt update \
+          && sudo apt install gh -y
+          gh --version
+          echo ${{ secrets.PAL_PAT }} | gh auth login --with-token
+          gh release create $Version -t "Release $Version" --notes "Release $Version" --draft
+
   release:
     strategy:
       matrix:
@@ -51,8 +68,6 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           $AppName = "pal"
-          $GithubUsername = "<username>"
-          $GithubRepo = "<repo>"
           $Version = git describe --tags --abbrev=0
           $OutputDir = "build"
           Remove-Item -Recurse -Force $OutputDir -ErrorAction SilentlyContinue
@@ -65,8 +80,8 @@ jobs:
           ls
           cd ..
           echo ${{ secrets.PAL_PAT }} | gh auth login --with-token
-          gh release create $Version "$OutputDir\$AppName-$Version-win-amd64.zip" -t "Release $Version amd64"
-          gh release create $Version "$OutputDir\$AppName-$Version-win-arm64.zip" -t "Release $Version arm64"
+          gh release upload $Version "$OutputDir\$AppName-$Version-win-amd64.zip"
+          gh release upload $Version "$OutputDir\$AppName-$Version-win-arm64.zip"
 
   
       - name: Generate binary on Ubuntu
@@ -75,8 +90,6 @@ jobs:
           APP_NAME="pal"
           VERSION=$(git describe --tags --abbrev=0)
           OUTPUT_DIR="build"
-          GITHUB_USERNAME="<username>"
-          GITHUB_REPO="<repo>"
           rm -rf $OUTPUT_DIR
           mkdir -p $OUTPUT_DIR
           env GOARCH=arm64 GOOS=linux go build -ldflags="-s -w" -o $OUTPUT_DIR/$APP_NAME-linux-arm64
@@ -87,16 +100,14 @@ jobs:
           ls -lart
           cd ..
           echo ${{ secrets.PAL_PAT }} | gh auth login --with-token
-          gh release create $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-linux-amd64.zip -t "Release $VERSION amd64"
-          gh release create $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-linux-arm64.zip -t "Release $VERSION arm64"
+          gh release upload $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-linux-amd64.zip
+          gh release upload $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-linux-arm64.zip
 
       - name: Generate binary on Mac
         if: matrix.os == 'macos-latest'
         run: |
           APP_NAME="pal"
           VERSION=$(git describe --tags --abbrev=0)
-          OUTPUT_DIR="build"
-          GITHUB_USERNAME="<username>"
           GITHUB_REPO="<repo>"
           rm -rf $OUTPUT_DIR
           mkdir -p $OUTPUT_DIR
@@ -108,5 +119,5 @@ jobs:
           ls -lart
           cd ..
           echo ${{ secrets.PAL_PAT }} | gh auth login --with-token
-          gh release create $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-darwin-amd64.zip -t "Release $VERSION amd64"
-          gh release create $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-darwin-arm64.zip -t "Release $VERSION arm64"
+          gh release upload $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-darwin-amd64.zip
+          gh release upload $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-darwin-arm64.zip
