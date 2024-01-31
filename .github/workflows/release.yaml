@@ -22,23 +22,6 @@ jobs:
           go-version: '1.22.0-rc.1'
           go-version-file: go.mod
           check-latest: true
-          
-      - name: Install dependencies on Ubuntu
-        if: matrix.os == 'ubuntu-20.04'
-        run: |
-          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
-          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
-          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
-          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-          && sudo apt update \
-          && sudo apt install gh -y
-          gh --version
-      
-      - name: Install dependencies on Windows
-        if: matrix.os == 'windows-latest'
-        run: |
-          choco install gh
-          gh --version
       
       - name: Login to GHCR
         uses: docker/login-action@v3  
@@ -50,6 +33,8 @@ jobs:
       - name: Generate binary on Windows
         if: matrix.os == 'windows-latest'
         run: |
+          choco install gh
+          gh --version
           $AppName = "pal"
           $GithubUsername = "<username>"
           $GithubRepo = "<repo>"
@@ -74,6 +59,13 @@ jobs:
       - name: Generate binary on Ubuntu
         if: matrix.os == 'ubuntu-20.04'
         run: |
+          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+          && sudo apt update \
+          && sudo apt install gh -y
+          gh --version
           APP_NAME="pal"
           VERSION=$(git describe --tags --abbrev=0)
           OUTPUT_DIR="build"
