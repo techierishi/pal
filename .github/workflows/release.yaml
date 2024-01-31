@@ -12,6 +12,21 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: Release
     steps:
+      - name: Set up Lua
+        run: |
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            # Install Lua on Windows
+            choco install lua
+          elif [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+            # Install Lua on Ubuntu (Linux)
+            sudo apt-get update
+            sudo apt-get install -y lua5.3
+          else
+            # Install Lua on MacOS using Homebrew
+            brew install lua
+          fi
+      - name: Display Lua version
+        run: lua -v
       - name: Checkout code
         uses: actions/checkout@v4.1.1
         with:
@@ -33,6 +48,6 @@ jobs:
       - name: Generate binary
         run: |
           go version
-          go build .
+          go build -ldflags="-s -w" .
           ls
 
