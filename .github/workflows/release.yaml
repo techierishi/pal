@@ -43,14 +43,16 @@ jobs:
           & go build -o "$OutputDir\$AppName-arm64.exe" -tags netgo -ldflags "-s -w" -pkgdir $env:GOPATH/pkg/windows_amd64/netgo
           & go build -o "$OutputDir\$AppName-amd64.exe" -tags netgo -ldflags "-s -w" -pkgdir $env:GOPATH/pkg/windows_amd64/netgo
           cd $OutputDir
-          Compress-Archive -Path "$AppName-arm64.exe", "$AppName-amd64.exe" -DestinationPath "$AppName-$Version.zip"
+          Compress-Archive -Path "$AppName-amd64.exe" -DestinationPath "$AppName-$Version-win-amd64.zip"
+          Compress-Archive -Path "$AppName-arm64.exe" -DestinationPath "$AppName-$Version-win-arm64.zip"
           ls
-          # cd ..
-          # gh release create $Version "$OutputDir\$AppName-$Version.zip" -t "Release $Version"
+          cd ..
+          gh release create $Version "$OutputDir\$AppName-$Version-win-amd64.zip" -t "Release $Version amd64"
+          gh release create $Version "$OutputDir\$AppName-$Version-win-arm64.zip" -t "Release $Version arm64"
 
 
-      - name: Generate binary on Ubuntu and Mac
-        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+      - name: Generate binary on Ubuntu
+        if: matrix.os == 'ubuntu-latest'
         run: |
           APP_NAME="pal"
           VERSION=$(git describe --tags --abbrev=0)
@@ -59,11 +61,32 @@ jobs:
           GITHUB_REPO="<repo>"
           rm -rf $OUTPUT_DIR
           mkdir -p $OUTPUT_DIR
-          env GOARCH=arm64 GOOS=linux go build -ldflags="-s -w" -o $OUTPUT_DIR/$APP_NAME-arm64
-          env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o $OUTPUT_DIR/$APP_NAME-amd64
+          env GOARCH=arm64 GOOS=linux go build -ldflags="-s -w" -o $OUTPUT_DIR/$APP_NAME-linux-arm64
+          env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o $OUTPUT_DIR/$APP_NAME-linux-amd64
           cd $OUTPUT_DIR
-          zip $APP_NAME-$VERSION.zip $APP_NAME-arm64 $APP_NAME-amd64
+          zip $APP_NAME-$VERSION-linux-amd64.zip $APP_NAME-linux-amd64
+          zip $APP_NAME-$VERSION-linux-arm64.zip $APP_NAME-linux-amd64
           ls -lart
-          # cd ..
-          # gh release create $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION.zip -t "Release $VERSION"
+          cd ..
+          gh release create $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-linux-amd64.zip -t "Release $VERSION amd64"
+          gh release create $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-linux-arm64.zip -t "Release $VERSION arm64"
 
+      - name: Generate binary on Mac
+        if: matrix.os == 'macos-latest'
+        run: |
+          APP_NAME="pal"
+          VERSION=$(git describe --tags --abbrev=0)
+          OUTPUT_DIR="build"
+          GITHUB_USERNAME="<username>"
+          GITHUB_REPO="<repo>"
+          rm -rf $OUTPUT_DIR
+          mkdir -p $OUTPUT_DIR
+          env GOARCH=arm64 GOOS=darwin go build -ldflags="-s -w" -o $OUTPUT_DIR/$APP_NAME-darwin-arm64
+          env GOARCH=amd64 GOOS=darwin go build -ldflags="-s -w" -o $OUTPUT_DIR/$APP_NAME-darwin-amd64
+          cd $OUTPUT_DIR
+          zip $APP_NAME-$VERSION-darwin-amd64.zip $APP_NAME-darwin-amd64
+          zip $APP_NAME-$VERSION-darwin-arm64.zip $APP_NAME-darwin-amd64
+          ls -lart
+          cd ..
+          gh release create $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-darwin-amd64.zip -t "Release $VERSION amd64"
+          gh release create $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-darwin-arm64.zip -t "Release $VERSION arm64"
