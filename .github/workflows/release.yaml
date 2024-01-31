@@ -108,7 +108,7 @@ jobs:
           gh release upload $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-linux-arm64.zip
 
       - name: Generate binary on Mac
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-woind'
         run: |
           APP_NAME="pal"
           VERSION=$(git describe --tags --abbrev=0)
