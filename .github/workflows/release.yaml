@@ -12,21 +12,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: Release
     steps:
-      - name: Install Lua on Windows
-        if: matrix.os == 'windows-latest'
-        run: choco install lua
-
-      - name: Install Lua on Ubuntu
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y lua5.3
-
-      - name: Install Lua on MacOS
-        if: matrix.os == 'macos-latest'
-        run: brew install lua
-      - name: Display Lua version
-        run: lua -v
       - name: Checkout code
         uses: actions/checkout@v4.1.1
         with:
@@ -45,9 +30,40 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.PAL_PAT }}
 
-      - name: Generate binary
+      - name: Generate binary on Windows
+        if: matrix.os == 'windows-latest'
         run: |
-          go version
-          go build -ldflags="-s -w" .
+          $AppName = "pal"
+          $GithubUsername = "<username>"
+          $GithubRepo = "<repo>"
+          $Version = git describe --tags --abbrev=0
+          $OutputDir = "build"
+          Remove-Item -Recurse -Force $OutputDir -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path $OutputDir | Out-Null
+          & go build -o "$OutputDir\$AppName-arm64.exe" -tags netgo -ldflags "-s -w" -pkgdir $env:GOPATH/pkg/windows_amd64/netgo
+          & go build -o "$OutputDir\$AppName-amd64.exe" -tags netgo -ldflags "-s -w" -pkgdir $env:GOPATH/pkg/windows_amd64/netgo
+          cd $OutputDir
+          Compress-Archive -Path "$AppName-arm64.exe", "$AppName-amd64.exe" -DestinationPath "$AppName-$Version.zip"
           ls
+          # cd ..
+          # gh release create $Version "$OutputDir\$AppName-$Version.zip" -t "Release $Version"
+
+
+      - name: Generate binary on Ubuntu and Mac
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+        run: |
+          APP_NAME="pal"
+          VERSION=$(git describe --tags --abbrev=0)
+          OUTPUT_DIR="build"
+          GITHUB_USERNAME="<username>"
+          GITHUB_REPO="<repo>"
+          rm -rf $OUTPUT_DIR
+          mkdir -p $OUTPUT_DIR
+          env GOARCH=arm64 GOOS=linux go build -ldflags="-s -w" -o $OUTPUT_DIR/$APP_NAME-arm64
+          env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o $OUTPUT_DIR/$APP_NAME-amd64
+          cd $OUTPUT_DIR
+          zip $APP_NAME-$VERSION.zip $APP_NAME-arm64 $APP_NAME-amd64
+          ls -lart
+          # cd ..
+          # gh release create $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION.zip -t "Release $VERSION"
 
