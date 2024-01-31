@@ -6,13 +6,12 @@ on:
   workflow_dispatch:
 jobs:
   release:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, mac-woind]
+    runs-on: ${{ matrix.os }}
     name: Release
-    runs-on: ubuntu-20.04
     steps:
-      - name: Install dependencies
-        run: |
-          sudo apt-get -y update
-          sudo apt-get -y install rpm
       - name: Checkout code
         uses: actions/checkout@v4.1.1
         with:
@@ -21,9 +20,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
       
       - name: Login to GHCR
         uses: docker/login-action@v3  
@@ -32,24 +28,9 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.PAL_PAT }}
 
-      - name: Run GoReleaser
+      - name: Generate binary
         run: |
-          docker run \
-          		--rm \
-          		--privileged \
-          		-e CGO_ENABLED=1 \
-          		-e GITHUB_TOKEN=${GITHUB_TOKEN} \
-              -e DOCKER_CONFIG \
-          		-v /var/run/docker.sock:/var/run/docker.sock \
-          		-v `pwd`:/go/src/$(PACKAGE_NAME) \
-          		-w /go/src/$(PACKAGE_NAME) \
-          		techierishi/goreleaser-cross:${GOLANG_CROSS_VERSION} \
-          		--clean --skip=validate
-          ls -lart ./dist/ || true
-        env:
-          PACKAGE_NAME: github.com/techierishi/pal
-          GOLANG_CROSS_VERSION: v1.21.6
-          GITHUB_TOKEN: ${{ secrets.PAL_PAT }}
-          VERSION: ${{ steps.prepare.outputs.tag_name }}
-
+          go version
+          go build .
+          ls -lart
 
