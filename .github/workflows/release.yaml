@@ -19,8 +19,9 @@ jobs:
           && sudo apt update \
           && sudo apt install gh -y
           gh --version
+          VERSION=$(git describe --tags --abbrev=0)
           echo ${{ secrets.PAL_PAT }} | gh auth login --with-token
-          gh release create $Version -t "Release $Version" --notes "Release $Version" --draft
+          gh release create $VERSION -t "Release $VERSION" --notes "Release $VERSION" --draft
 
   release:
     strategy:
