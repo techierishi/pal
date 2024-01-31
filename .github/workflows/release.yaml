@@ -29,7 +29,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        os: [ubuntu-20.04, windows-latest, mac-woind]
+        os: [ubuntu-20.04, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     name: Release
     steps:
@@ -108,7 +108,7 @@ jobs:
           gh release upload $VERSION $OUTPUT_DIR/$APP_NAME-$VERSION-linux-arm64.zip
 
       - name: Generate binary on Mac
-        if: matrix.os == 'mac-woind'
+        if: matrix.os == 'macos-latest'
         run: |
           APP_NAME="pal"
           VERSION=$(git describe --tags --abbrev=0)
