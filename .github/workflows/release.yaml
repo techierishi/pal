@@ -24,6 +24,7 @@ jobs:
           gh release create $VERSION -t "Release $VERSION" --notes "Release $VERSION" --draft
 
   release:
+    needs: build
     strategy:
       matrix:
         os: [ubuntu-20.04, windows-latest, mac-woind]
