@@ -8,7 +8,7 @@ jobs:
   release:
     strategy:
       matrix:
-        os: [ubuntu-20.04-16core, windows-latest, mac-woind]
+        os: [ubuntu-20.04, windows-latest, mac-woind]
     runs-on: ${{ matrix.os }}
     name: Release
     steps:
@@ -24,7 +24,7 @@ jobs:
           check-latest: true
           
       - name: Install dependencies on Ubuntu
-        if: matrix.os == 'ubuntu-20.04-16core'
+        if: matrix.os == 'ubuntu-20.04'
         run: |
           sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
           sudo apt-add-repository https://cli.github.com/packages
@@ -70,7 +70,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAL_PAT }}
   
       - name: Generate binary on Ubuntu
-        if: matrix.os == 'ubuntu-20.04-16core'
+        if: matrix.os == 'ubuntu-20.04'
         run: |
           APP_NAME="pal"
           VERSION=$(git describe --tags --abbrev=0)
