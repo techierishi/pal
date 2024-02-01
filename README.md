@@ -155,8 +155,16 @@ Use "pal cred [command] --help" for more information about a command.
 
 https://github.com/techierishi/pal/assets/7880021/8ff7d8aa-bf41-4fb9-a9a7-44d241913721
 
-
 ## Installation
+Visit the release page to find the binary for your os at
+https://github.com/techierishi/pal/releases
+
+- Download the binary
+- Extract it
+- Rename binary to pal or pal.exe based on os
+- Add the binary to environment path
+
+## Build
 
 Currently you can clone this repo and compile using following steps
 ```
@@ -165,6 +173,3 @@ cd pal
 go mod tidy
 go build
 ```
-
-We will add binaries for multiple platforms in future
-
