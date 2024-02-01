@@ -108,7 +108,7 @@ jobs:
           VERSION=$(git describe --tags --abbrev=0)
           GITHUB_REPO="<repo>"
           rm -rf $OUTPUT_DIR
-          mkdir -p $OUTPUT_DIR
+          mkdir $OUTPUT_DIR
           env GOARCH=arm64 GOOS=darwin go build -ldflags="-s -w" -o $OUTPUT_DIR/$APP_NAME-darwin-arm64
           env GOARCH=amd64 GOOS=darwin go build -ldflags="-s -w" -o $OUTPUT_DIR/$APP_NAME-darwin-amd64
           cd $OUTPUT_DIR
